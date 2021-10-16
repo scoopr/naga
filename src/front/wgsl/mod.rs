@@ -4126,11 +4126,19 @@ impl Parser {
     }
 
     pub fn parse(&mut self, source: &str) -> Result<crate::Module, ParseError> {
+        let module = crate::Module::default();
+        self.parse_to_module(source, module)
+    }
+
+    pub fn parse_to_module(
+        &mut self,
+        source: &str,
+        mut module: crate::Module,
+    ) -> Result<crate::Module, ParseError> {
         self.scopes.clear();
         self.lookup_type.clear();
         self.layouter.clear();
 
-        let mut module = crate::Module::default();
         let mut lexer = Lexer::new(source);
         let mut lookup_global_expression = FastHashMap::default();
         loop {
