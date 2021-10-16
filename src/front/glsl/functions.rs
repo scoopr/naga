@@ -963,20 +963,22 @@ impl Parser {
 
         body.push(Statement::Return { value }, Default::default());
 
-        self.module.entry_points.push(EntryPoint {
-            name: "main".to_string(),
-            stage: self.meta.stage,
-            early_depth_test: Some(crate::EarlyDepthTest { conservative: None })
-                .filter(|_| self.meta.early_fragment_tests),
-            workgroup_size: self.meta.workgroup_size,
-            function: Function {
-                arguments,
-                expressions,
-                body,
-                result: ty.map(|ty| FunctionResult { ty, binding: None }),
-                ..Default::default()
-            },
-        });
+        if let Some(stage) = self.meta.stage {
+            self.module.entry_points.push(EntryPoint {
+                name: "main".to_string(),
+                stage,
+                early_depth_test: Some(crate::EarlyDepthTest { conservative: None })
+                    .filter(|_| self.meta.early_fragment_tests),
+                workgroup_size: self.meta.workgroup_size,
+                function: Function {
+                    arguments,
+                    expressions,
+                    body,
+                    result: ty.map(|ty| FunctionResult { ty, binding: None }),
+                    ..Default::default()
+                },
+            });
+        }
     }
 }
 

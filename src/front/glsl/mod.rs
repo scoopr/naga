@@ -43,7 +43,7 @@ type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug)]
 pub struct Options {
     /// The shader stage in the pipeline.
-    pub stage: ShaderStage,
+    pub stage: Option<ShaderStage>,
     /// Preprocesor definitions to be used, akin to having
     /// ```glsl
     /// #define key value
@@ -55,7 +55,7 @@ pub struct Options {
 impl From<ShaderStage> for Options {
     fn from(stage: ShaderStage) -> Self {
         Options {
-            stage,
+            stage: Some(stage),
             defines: FastHashMap::default(),
         }
     }
@@ -75,7 +75,7 @@ pub struct ShaderMetadata {
     pub profile: Profile,
     /// The shader stage in the pipeline, passed to the [`parse`](Parser::parse)
     /// method via the [`Options`](Options) struct.
-    pub stage: ShaderStage,
+    pub stage: Option<ShaderStage>,
 
     /// The workgroup size for compute shaders, defaults to `[1; 3]` for
     /// compute shaders and `[0; 3]` for non compute shaders.
@@ -95,11 +95,15 @@ pub struct ShaderMetadata {
 }
 
 impl ShaderMetadata {
-    fn reset(&mut self, stage: ShaderStage) {
+    fn reset(&mut self, stage: Option<ShaderStage>) {
         self.version = 0;
         self.profile = Profile::Core;
         self.stage = stage;
-        self.workgroup_size = [if stage == ShaderStage::Compute { 1 } else { 0 }; 3];
+        self.workgroup_size = [if stage == Some(ShaderStage::Compute) {
+            1
+        } else {
+            0
+        }; 3];
         self.early_fragment_tests = false;
         self.extensions.clear();
     }
@@ -110,7 +114,7 @@ impl Default for ShaderMetadata {
         ShaderMetadata {
             version: 0,
             profile: Profile::Core,
-            stage: ShaderStage::Vertex,
+            stage: Some(ShaderStage::Vertex),
             workgroup_size: [0; 3],
             early_fragment_tests: false,
             extensions: FastHashSet::default(),
@@ -172,7 +176,7 @@ pub struct Parser {
 }
 
 impl Parser {
-    fn reset(&mut self, stage: ShaderStage) {
+    fn reset(&mut self, stage: Option<ShaderStage>) {
         self.meta.reset(stage);
 
         self.lookup_function.clear();

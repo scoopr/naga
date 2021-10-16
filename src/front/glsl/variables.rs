@@ -210,7 +210,7 @@ impl Parser {
                         "gl_CullDistance" => BuiltIn::FragDepth,
                         _ => unreachable!(),
                     },
-                    mutable: self.meta.stage == ShaderStage::Vertex,
+                    mutable: self.meta.stage == Some(ShaderStage::Vertex),
                     storage: StorageQualifier::Output,
                 }
             }
