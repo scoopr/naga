@@ -621,9 +621,9 @@ fn convert_glsl_folder() {
             .parse(
                 &naga::front::glsl::Options {
                     stage: match entry.path().extension().and_then(|s| s.to_str()).unwrap() {
-                        "vert" => naga::ShaderStage::Vertex,
-                        "frag" => naga::ShaderStage::Fragment,
-                        "comp" => naga::ShaderStage::Compute,
+                        "vert" => Some(naga::ShaderStage::Vertex),
+                        "frag" => Some(naga::ShaderStage::Fragment),
+                        "comp" => Some(naga::ShaderStage::Compute),
                         ext => panic!("Unknown extension for glsl file {}", ext),
                     },
                     defines: Default::default(),
