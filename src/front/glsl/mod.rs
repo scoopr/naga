@@ -198,7 +198,17 @@ impl Parser {
         options: &Options,
         source: &str,
     ) -> std::result::Result<Module, Vec<Error>> {
+        let module = Module::default();
+        self.parse_to_module(options, source, module)
+    }
+    pub fn parse_to_module(
+        &mut self,
+        options: &Options,
+        source: &str,
+        module: Module,
+    ) -> std::result::Result<Module, Vec<Error>> {
         self.reset(options.stage);
+        self.module = module;
 
         let lexer = lex::Lexer::new(source, &options.defines);
         let mut ctx = ParsingContext::new(lexer);
