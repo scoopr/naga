@@ -267,9 +267,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 .parse(
                     &naga::front::glsl::Options {
                         stage: match ext {
-                            "vert" => naga::ShaderStage::Vertex,
-                            "frag" => naga::ShaderStage::Fragment,
-                            "comp" => naga::ShaderStage::Compute,
+                            "vert" => Some(naga::ShaderStage::Vertex),
+                            "frag" => Some(naga::ShaderStage::Fragment),
+                            "comp" => Some(naga::ShaderStage::Compute),
                             _ => unreachable!(),
                         },
                         defines: Default::default(),
