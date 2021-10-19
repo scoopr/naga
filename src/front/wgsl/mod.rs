@@ -4139,6 +4139,8 @@ impl Parser {
         self.lookup_type.clear();
         self.layouter.clear();
 
+        self.types_from_module(&module);
+
         let mut lexer = Lexer::new(source);
         let mut lookup_global_expression = FastHashMap::default();
         loop {
@@ -4152,6 +4154,14 @@ impl Parser {
                     };
                     return Ok(module);
                 }
+            }
+        }
+    }
+
+    fn types_from_module(&mut self, module: &crate::Module) {
+        for ty in module.types.iter() {
+            if let Some(ref name) = ty.1.name {
+                self.lookup_type.insert(name.to_owned(), ty.0);
             }
         }
     }
