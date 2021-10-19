@@ -208,8 +208,8 @@ impl Parser {
         module: Module,
     ) -> std::result::Result<Module, Vec<Error>> {
         self.reset(options.stage);
+        self.functions_from_module(&module);
         self.module = module;
-
         let lexer = lex::Lexer::new(source, &options.defines);
         let mut ctx = ParsingContext::new(lexer);
 
@@ -225,6 +225,36 @@ impl Parser {
             let mut errors = Vec::new();
             std::mem::swap(&mut self.errors, &mut errors);
             Err(errors)
+        }
+    }
+
+    fn functions_from_module(&mut self, module: &Module) {
+        for (handle, func) in module.functions.iter() {
+            if let Some(ref name) = func.name {
+                let arg_types = func.arguments.iter().map(|arg| arg.ty).collect();
+                let arg_info = func
+                    .arguments
+                    .iter()
+                    .map(|_| ast::ParameterInfo {
+                        qualifier: ast::ParameterQualifier::In,
+                        depth: false,
+                    })
+                    .collect();
+
+                let decl = FunctionDeclaration {
+                    overloads: vec![ast::Overload {
+                        parameters: arg_types,
+                        parameters_info: arg_info,
+                        kind: ast::FunctionKind::Call(handle),
+                        defined: true,
+                        void: func.result.is_none(),
+                    }],
+                    builtin: false,
+                    double: false,
+                };
+
+                self.lookup_function.insert(name.to_owned(), decl);
+            }
         }
     }
 
